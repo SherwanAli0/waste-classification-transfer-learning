@@ -22,12 +22,12 @@ Build a binary image classifier for organic vs recyclable waste using transfer l
 - **Structure** (created in the current working directory when the script extracts the archive):
   ```
   o-vs-r-split/
-  ├── train/
-  │   ├── O/ (Organic waste images)
-  │   └── R/ (Recyclable waste images)
-  └── test/
-      ├── O/ (Organic test images)
-      └── R/ (Recyclable test images)
+  +-- train/
+  |   +-- O/ (Organic waste images)
+  |   +-- R/ (Recyclable waste images)
+  +-- test/
+      +-- O/ (Organic test images)
+      +-- R/ (Recyclable test images)
   ```
 - The archive and the images are not stored in this repository. The script downloads them only if `o-vs-r-split/train` and `o-vs-r-split/test` are missing; delete `o-vs-r-split/` to force a fresh download.
 
@@ -179,16 +179,16 @@ These tests replace TensorFlow with test doubles and never touch the network. Th
 ## File Structure
 
 ```
-├── waste_classification.py    # Main implementation
-├── requirements.txt           # Python dependencies
-├── README.md                  # This file
-├── LICENSE                    # MIT licence
-├── Screenshots/               # Output screenshots from the original notebook run
-├── tests/                     # Tests that need no TensorFlow, data or network
-└── (generated in the working directory when you run the script)
-    ├── o-vs-r-split/                    # downloaded dataset
-    ├── O_R_tlearn_vgg16.keras           # best feature-extraction checkpoint
-    └── O_R_tlearn_fine_tune_vgg16.keras # best fine-tuned checkpoint
++-- waste_classification.py    # Main implementation
++-- requirements.txt           # Python dependencies
++-- README.md                  # This file
++-- LICENSE                    # MIT licence
++-- Screenshots/               # Output screenshots from the original notebook run
++-- tests/                     # Tests that need no TensorFlow, data or network
++-- (generated in the working directory when you run the script)
+    +-- o-vs-r-split/                    # downloaded dataset
+    +-- O_R_tlearn_vgg16.keras           # best feature-extraction checkpoint
+    +-- O_R_tlearn_fine_tune_vgg16.keras # best fine-tuned checkpoint
 ```
 
 ## What this project covers
