@@ -84,15 +84,67 @@ The project is structured around 10 tasks. The screenshots are from the original
 
 ## Results and what is verified
 
-- No test-set metrics are recorded in this repository.
-- The screenshots come from the original Jupyter notebook run (TensorFlow 2.17.0). The accuracy curves show validation accuracy of roughly 0.83 (feature extraction) and roughly 0.9 (fine-tuned) at epoch 10, read by eye from the plots. These are historical figures; they have not been reproduced from `waste_classification.py`, and no saved models are included.
-- This repository does not record an end-to-end run (download, training, plots, evaluation) of `waste_classification.py` itself, only of the original notebook. What has been checked for the script, using test doubles and no dataset, is listed under "Checks that need no data".
+- **Historical (original notebook run, TensorFlow 2.17.0):** the screenshots show validation accuracy of roughly 0.83 (feature extraction) and roughly 0.9 (fine-tuned) at epoch 10, read by eye from the plots. No test-set metrics from that run were recorded, and no saved models are included. These figures are unverified.
+- **Measured (re-run on 2026-11-03):** see the section below. It is one unseeded run of the unchanged `waste_classification.py`, so it is a measurement, not a reproduction of the historical figures.
+- What has been checked without TensorFlow or the dataset, using test doubles, is listed under "Checks that need no data".
 
 ### Evaluation scope
 
-The classification reports printed at the end are **not** computed on the whole test set. The script takes the first 50 images of `test/O` and the first 50 of `test/R` (images sorted by filename), 100 images in total, and prints the subset size and the number of test images available. The notebook run reported `Found 200 images belonging to 2 classes` for the test folder (see the Task 2 screenshot), so the subset is about half of it. `test_generator` is created for Task 2 but is not used for evaluation.
+The classification reports printed at the end are **not** computed on the whole test set. The script takes the first 50 images of `test/O` and the first 50 of `test/R` (images sorted by filename), 100 images in total, and prints the subset size and the number of test images available. The test folder holds 200 images (100 `O`, 100 `R`; the Task 2 screenshot and the 2026-11-03 re-run both report `Found 200 images belonging to 2 classes`), so the subset is half of it. `test_generator` is created for Task 2 but is not used for evaluation.
 
 Earlier versions picked the "first 50" in the operating system's directory-listing order, which varies between filesystems. Sorting makes the subset reproducible, but it can select different images than the original notebook run did, so the sample image in Tasks 9 and 10 and any per-class numbers may differ from the historical screenshots.
+
+## Re-run on 2026-11-03
+
+I re-ran the unchanged `waste_classification.py` once to replace unverifiable figures with measured ones. Preprocessing, model and hyperparameters were not changed. The run used a scratch copy of the repository, so the downloaded dataset, the VGG16 weights and the saved models are not part of this repository.
+
+- **Environment**: Python 3.11.9, TensorFlow 2.21.0, Keras 3.15.1, NumPy 2.4.6, scikit-learn 1.9.1; Windows 11, CPU only (12 logical cores; GPU is not used on native Windows for TensorFlow 2.11 and later).
+- **Downloads**: the dataset archive from the URL in the script, and the standard Keras VGG16 ImageNet weights (`vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5`).
+- **Data**: 800 training, 200 validation and 200 test images (100 `O` and 100 `R` in the test folder); training generator length 25.
+- **Seeds**: the script sets none for TensorFlow, NumPy or Python (`seed=42` goes to the data generators only). Results vary from run to run, so these numbers are one sample, not expected values.
+- **Runtime**: `main()` took 692 s (about 11.5 min); the whole scratch run, including imports and the extra full-test evaluation below, took 744 s.
+- **Early stopping** did not trigger. The evaluated models are the best-validation-loss checkpoints: epoch 10 (val loss 0.334) for the extract features model and epoch 7 (val loss 0.274) for the fine-tuned model.
+
+### Validation accuracy per epoch
+
+Validation uses `val_generator.samples // 32 = 6` batches, i.e. 192 of the 200 validation images, with shuffling on.
+
+| Epoch | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Extract features | 0.531 | 0.734 | 0.734 | 0.844 | 0.828 | 0.849 | 0.802 | 0.823 | 0.844 | 0.849 |
+| Fine-tuned | 0.828 | 0.828 | 0.776 | 0.781 | 0.849 | 0.875 | 0.891 | 0.885 | 0.875 | 0.865 |
+
+### Test results (accuracy, same inference path in both rows)
+
+The inference path is the one in `main()`: files in sorted filename order, `load_img` at 150x150, divide by 255, `predict`, threshold 0.5. The full-test numbers come from the same functions with no per-class cap; they are reported separately from the 100-image subset the script prints.
+
+| Evaluated on | Extract features | Fine-tuned |
+|---|---|---|
+| First 50 per class (100 images, what the script prints) | 0.80 | 0.83 |
+| Full test directory (200 images) | 0.84 | 0.86 |
+
+Full test directory, per class (precision / recall / F1, 100 images each):
+
+| Model | `O` | `R` | Confusion matrix (rows true `O`, `R`; columns predicted `O`, `R`) |
+|---|---|---|---|
+| Extract features | 0.80 / 0.91 / 0.85 | 0.90 / 0.77 / 0.83 | [[91, 9], [23, 77]] |
+| Fine-tuned | 0.85 / 0.88 / 0.86 | 0.88 / 0.84 / 0.86 | [[88, 12], [16, 84]] |
+
+First 50 per class (100 images), per class (precision / recall / F1, 50 images each):
+
+| Model | `O` | `R` |
+|---|---|---|
+| Extract features | 0.74 / 0.92 / 0.82 | 0.89 / 0.68 / 0.77 |
+| Fine-tuned | 0.80 / 0.88 / 0.84 | 0.87 / 0.78 / 0.82 |
+
+### Compared with the historical screenshots
+
+| | Historical (screenshots, read by eye) | Re-run, epoch 10 | Re-run, best-val-loss checkpoint |
+|---|---|---|---|
+| Extract features, validation accuracy | about 0.83 | 0.849 | 0.849 (epoch 10) |
+| Fine-tuned, validation accuracy | about 0.9 | 0.865 | 0.891 (epoch 7) |
+
+The historical test-set reports were not recorded, so there is nothing to compare the test numbers against. The two models differ by 4 of 200 full-test images in this single unseeded run, which is not enough to claim that fine-tuning improves accuracy.
 
 ## Installation and Usage
 
@@ -100,7 +152,7 @@ Earlier versions picked the "first 50" in the operating system's directory-listi
 ```bash
 pip install -r requirements.txt
 ```
-The original run used TensorFlow 2.17.0. `requirements.txt` allows any `tensorflow>=2.10.0`, but no other version has been tested with this script. Internet access is needed for the dataset and for Keras to fetch the ImageNet VGG16 weights.
+The original notebook run used TensorFlow 2.17.0 and the 2026-11-03 re-run used TensorFlow 2.21.0 with Keras 3.15.1 (Python 3.11.9). `requirements.txt` allows any `tensorflow>=2.10.0`, but no other version has been tested with this script. On CPU the full script took about 12 minutes. Internet access is needed for the dataset and for Keras to fetch the ImageNet VGG16 weights.
 
 ### Running the Project
 Run from the directory where the dataset and the saved models should be written (normally the repository root); all paths are relative to the current working directory.
@@ -149,9 +201,9 @@ These tests replace TensorFlow with test doubles and never touch the network. Th
 ## Limitations
 
 - Educational scope: nothing here shows the models work in a sorting facility, a smart bin or any other real setting.
-- Short training (10 epochs of 5 steps), no repeated runs, and no comparison of the two models on the full test set, so no claim is made that fine-tuning improved performance.
+- Short training (10 epochs of 5 steps), no seeds, and a single measured run, so the numbers vary between runs; no claim is made that fine-tuning improved performance.
 - Only two classes, from a reduced dataset supplied by the course, whose upstream source is not documented here.
-- Evaluation covers a 100-image subset; the historical figures above are unverified.
+- The script's own report covers a 100-image subset of the 200 test images; the full-test numbers in the re-run section came from a separate evaluation with the same inference path. The historical screenshot figures are unverified.
 
 ## License
 
