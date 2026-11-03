@@ -1,13 +1,10 @@
 # Waste Classification Using Transfer Learning
 
-**Final Project for the IBM AI Engineering Professional Certificate (Coursera)**
-**Module 3: Building Deep Learning Models with TensorFlow**
+**IBM AI Engineering Certificate Final Project**
 
-This is coursework. It uses transfer learning with VGG16 to classify waste images as organic (`O`) or recyclable (`R`). The task structure (10 required tasks), the scenario text and the dataset archive come from the course; this repository holds my implementation of those tasks. It is an educational exercise, not a deployed or validated system.
+I completed this project myself as the final project of the IBM AI Engineering Professional Certificate. The course supplied the dataset and the task structure (10 tasks); the implementation in this repository is my own work. It uses transfer learning with VGG16 to classify waste images as organic (`O`) or recyclable (`R`). It is an educational exercise, not a deployed or validated system.
 
 ## Project Overview
-
-Scenario (from the course brief): a company called EcoClean lacks an efficient and scalable way to automate waste sorting, and the project asks for a model that can separate recyclable from organic waste in images.
 
 ### Aim
 Build a binary image classifier for organic vs recyclable waste using transfer learning, and compare a feature-extraction model with a partially fine-tuned one.
@@ -15,13 +12,12 @@ Build a binary image classifier for organic vs recyclable waste using transfer l
 ## Course Information
 
 - **Program**: IBM AI Engineering Professional Certificate
-- **Module**: Module 3 - Building Deep Learning Models with TensorFlow
 - **Platform**: Coursera
-- **Project Type**: Final Project with 10 Required Tasks
+- **Project Type**: Final project with 10 tasks
 
 ## Dataset
 
-- **Source**: a course-hosted archive, `o-vs-r-split-reduced-1200.zip` (about 11 MB), downloaded from the URL in `waste_classification.py`. Its upstream origin and licence are not documented in this repository.
+- **Source**: dataset supplied by the course, the archive `o-vs-r-split-reduced-1200.zip` (about 11 MB), downloaded from the URL in `waste_classification.py`. Its upstream origin and licence are not documented in this repository.
 - **Categories**: 2 classes. Keras assigns class indices alphabetically, so Organic (`O`) = 0 and Recyclable (`R`) = 1.
 - **Structure** (created in the current working directory when the script extracts the archive):
   ```
@@ -52,7 +48,7 @@ Build a binary image classifier for organic vs recyclable waste using transfer l
 
 ## Implementation Tasks
 
-The project is structured around 10 tasks required by the course. The screenshots are from the original notebook run (see "Results and what is verified").
+The project is structured around 10 tasks. The screenshots are from the original notebook run (see "Results and what is verified").
 
 | Task | Description | Screenshot |
 |---|---|---|
@@ -71,7 +67,7 @@ The project is structured around 10 tasks required by the course. The screenshot
 
 ### Data Processing
 - **Image Augmentation** (training generator only): width/height shifts of 10%, horizontal flips
-- **Normalization**: pixel values divided by 255 for training, validation, test and the manual evaluation, so training and inference preprocessing match. VGG16's own `preprocess_input` is not used; that is the course protocol, and changing it would require retraining.
+- **Normalization**: pixel values divided by 255 for training, validation, test and the manual evaluation, so training and inference preprocessing match. VGG16's own `preprocess_input` is not used; that is the preprocessing this project was built with, and changing it would require retraining.
 - **Validation split**: 20% of `train/`, taken by a separate generator without augmentation. Keras assigns files to the split by sorted filename (not randomly), so training and validation images do not overlap.
 - **Batch size**: 32
 
@@ -154,13 +150,13 @@ These tests replace TensorFlow with test doubles and never touch the network. Th
 
 - Educational scope: nothing here shows the models work in a sorting facility, a smart bin or any other real setting.
 - Short training (10 epochs of 5 steps), no repeated runs, and no comparison of the two models on the full test set, so no claim is made that fine-tuning improved performance.
-- Only two classes, from a reduced course dataset whose upstream source is not documented here.
+- Only two classes, from a reduced dataset supplied by the course, whose upstream source is not documented here.
 - Evaluation covers a 100-image subset; the historical figures above are unverified.
 
 ## License
 
-The code in this repository is released under the [MIT License](LICENSE). The dataset archive and any course-provided material are not covered by it and remain under their owners' terms.
+The code in this repository is released under the [MIT License](LICENSE). The dataset, any course-provided material and the pre-trained VGG16 ImageNet weights are not covered by it and have their own terms.
 
 ## Author
 
-Sherwan Ali (SherwanAli0). Developed as part of the IBM AI Engineering Professional Certificate coursework - Module 3: Building Deep Learning Models with TensorFlow.
+Sherwan Ali (SherwanAli0). Completed as the final project of the IBM AI Engineering Professional Certificate.
