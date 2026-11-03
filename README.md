@@ -167,7 +167,7 @@ The script will:
 4. Evaluate both models on the 100-image test subset described above
 5. Display one sample prediction per model
 
-Importing `waste_classification` does nothing; all work happens in `main()`.
+Importing `waste_classification` does not download data, train or plot; all of that happens in `main()`. The import itself loads TensorFlow and the other libraries and sets the `TF_CPP_MIN_LOG_LEVEL` environment variable if it is not already set.
 
 ### Checks that need no data
 ```bash
